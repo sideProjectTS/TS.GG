@@ -1,0 +1,130 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Riot API - LEAGUE-EXP-V4",
+    "version": "1.0.0",
+    "description": "리그 오브 레전드의 리그(랭크) 확장 API 명세입니다.\n티어, 디비전, 큐 타입별로 리그 엔트리(플레이어 랭킹)를 조회할 수 있습니다."
+  },
+  "tags": [
+    { "name": "LEAGUE-EXP-V4", "description": "리그 오브 레전드 랭크 확장 API 엔드포인트" }
+  ],
+  "paths": {
+    "/lol/league-exp/v4/entries/{queue}/{tier}/{division}": {
+      "get": {
+        "tags": ["LEAGUE-EXP-V4"],
+        "summary": "리그 엔트리 조회",
+        "description": "큐 타입, 티어, 디비전 기준으로 해당 리그의 모든 플레이어 랭킹 정보를 조회합니다.",
+        "parameters": [
+          {
+            "name": "queue",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "랭크 큐 타입 (예: RANKED_SOLO_5x5, RANKED_TFT 등)"
+          },
+          {
+            "name": "tier",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "리그 티어 (예: CHALLENGER, DIAMOND 등)"
+          },
+          {
+            "name": "division",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "리그 디비전 (예: I, II, III, IV)"
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "required": false,
+            "schema": { "type": "integer", "default": 1 },
+            "description": "페이지 번호 (기본값: 1)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/LeagueEntryDTO" }
+                }
+              }
+            }
+          },
+          "400": { "description": "Bad request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not found" },
+          "405": { "description": "Method not allowed" },
+          "415": { "description": "Unsupported media type" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Internal server error" },
+          "502": { "description": "Bad gateway" },
+          "503": { "description": "Service unavailable" },
+          "504": { "description": "Gateway timeout" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "LeagueEntryDTO": {
+        "type": "object",
+        "description": "리그 엔트리(플레이어 랭크 정보) 객체",
+        "properties": {
+          "leagueId": { "type": "string", "description": "리그 ID" },
+          "summonerId": { "type": "string", "description": "플레이어의 암호화된 Summoner ID" },
+          "puuid": { "type": "string", "description": "플레이어의 암호화된 PUUID" },
+          "queueType": { "type": "string", "description": "랭크 큐 타입" },
+          "tier": { "type": "string", "description": "리그 티어 (예: GOLD, PLATINUM)" },
+          "rank": { "type": "string", "description": "리그 내 세부 디비전 (예: I, II, III, IV)" },
+          "leaguePoints": { "type": "integer", "description": "리그 포인트 (LP)" },
+          "wins": { "type": "integer", "description": "승리 횟수" },
+          "losses": { "type": "integer", "description": "패배 횟수" },
+          "hotStreak": { "type": "boolean", "description": "현재 연승 여부" },
+          "veteran": { "type": "boolean", "description": "베테랑 여부" },
+          "freshBlood": { "type": "boolean", "description": "새로운 플레이어 여부" },
+          "inactive": { "type": "boolean", "description": "비활성화 여부" },
+          "miniSeries": { "$ref": "#/components/schemas/MiniSeriesDTO" }
+        },
+        "example": {
+          "leagueId": "abcd1234",
+          "summonerId": "xyz789",
+          "puuid": "p1234567890",
+          "queueType": "RANKED_SOLO_5x5",
+          "tier": "DIAMOND",
+          "rank": "II",
+          "leaguePoints": 87,
+          "wins": 120,
+          "losses": 95,
+          "hotStreak": false,
+          "veteran": true,
+          "freshBlood": false,
+          "inactive": false,
+          "miniSeries": { "wins": 2, "losses": 1, "target": 3, "progress": "WLW" }
+        }
+      },
+      "MiniSeriesDTO": {
+        "type": "object",
+        "description": "리그 승급전(시리즈) 정보 객체",
+        "properties": {
+          "losses": { "type": "integer", "description": "패배 횟수" },
+          "progress": { "type": "string", "description": "진행 상태 (예: WLW)" },
+          "target": { "type": "integer", "description": "필요한 승리 횟수" },
+          "wins": { "type": "integer", "description": "승리 횟수" }
+        },
+        "example": {
+          "losses": 1,
+          "progress": "WLW",
+          "target": 3,
+          "wins": 2
+        }
+      }
+    }
+  }
+}

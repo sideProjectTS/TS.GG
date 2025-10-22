@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <title>Riot Open API Docs</title>
+  <link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist/swagger-ui.css" />
+</head>
+<body>
+  <div id="swagger-ui"></div>
+  <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-bundle.js"></script>
+  <script src="https://unpkg.com/swagger-ui-dist/swagger-ui-standalone-preset.js"></script>
+  <script>
+    window.onload = function() {
+      const ui = SwaggerUIBundle({
+        urls: [
+          { url: "./data/account_v1.json", name: "ACCOUNT-V1" },
+          { url: "./data/champion_mastery_v4.json", name: "CHAMPION-MASTERY-V4" },
+          { url: "./data/champion_v3.json", name: "CHAMPION-V3" },
+          { url: "./data/clash_v1.json", name: "CLASH-V1" },
+          { url: "./data/league_exp_v4.json", name: "LEAGUE-EXP-V4" },
+          { url: "./data/league_v4.json", name: "LEAGUE-V4" },
+          { url: "./data/lol_challenges_v1.json", name: "LOL-CHALLENGES-V1" },
+          { url: "./data/lol_rso_match_v1.json", name: "LOL-RSO-MATCH-v1" },
+          { url: "./data/lol_status_v4.json", name: "LOL-STATUS-V4" }, 
+          { url: "./data/match_v5.json", name: "MATCH-V5" },
+          { url: "./data/spectator_v5.json", name: "SPECTATOR-V5" },
+          { url: "./data/summoner_v4.json", name: "SUMMONER-V4" },
+          { url: "./data/tournament_stub_v5.json", name: "TOURNAMENT-STUB-V5" },
+          { url: "./data/tournament_v5.json", name: "TOURNAMENT-V5" }
+        ],
+        dom_id: "#swagger-ui",
+        deepLinking: true,
+        docExpansion: "none",
+        defaultModelsExpandDepth: 9,
+        defaultModelExpandDepth: 3,
+        presets: [
+          SwaggerUIBundle.presets.apis,
+          SwaggerUIStandalonePreset
+        ],
+        layout: "StandaloneLayout",
+        requestInterceptor: (req) => {
+          console.log('Request:', req);
+          return req;
+        },
+        responseInterceptor: (res) => {
+          console.log('Response:', res);
+          return res;
+        }
+      });
+    }
+  </script>
+</body>
+</html>

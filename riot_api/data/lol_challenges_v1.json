@@ -1,0 +1,236 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Riot API - LOL-CHALLENGES-V1",
+    "version": "1.0.0",
+    "description": "리그 오브 레전드의 챌린지(Challenge) 시스템 API 명세입니다.\n플레이어별 챌린지 진행도, 챌린지 구성, 리더보드, 퍼센타일 정보를 제공합니다."
+  },
+  "tags": [
+    { "name": "LOL-CHALLENGES-V1", "description": "LoL 챌린지(도전 과제) 관련 API 엔드포인트" }
+  ],
+  "paths": {
+    "/lol/challenges/v1/challenges/config": {
+      "get": {
+        "tags": ["LOL-CHALLENGES-V1"],
+        "summary": "모든 챌린지 구성 정보 조회",
+        "description": "모든 챌린지의 기본 구성 정보(이름, 설명, 번역 포함)를 조회합니다.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/ChallengeConfigInfoDto" }
+                }
+              }
+            }
+          },
+          "400": { "description": "Bad request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not found" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/lol/challenges/v1/challenges/{challengeId}/config": {
+      "get": {
+        "tags": ["LOL-CHALLENGES-V1"],
+        "summary": "특정 챌린지 구성 정보 조회",
+        "description": "challengeId를 사용하여 해당 챌린지의 구성 정보를 조회합니다.",
+        "parameters": [
+          { "name": "challengeId", "in": "path", "required": true, "schema": { "type": "integer" }, "description": "챌린지 ID" }
+        ],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ChallengeConfigInfoDto" } } } },
+          "400": { "description": "Bad request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not found" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/lol/challenges/v1/challenges/{challengeId}/leaderboards/by-level/{level}": {
+      "get": {
+        "tags": ["LOL-CHALLENGES-V1"],
+        "summary": "챌린지 리더보드 조회",
+        "description": "특정 챌린지의 특정 레벨(MASTER, GRANDMASTER, CHALLENGER) 리더보드를 조회합니다.",
+        "parameters": [
+          { "name": "challengeId", "in": "path", "required": true, "schema": { "type": "integer" }, "description": "챌린지 ID" },
+          { "name": "level", "in": "path", "required": true, "schema": { "type": "string" }, "description": "리더보드 레벨 (MASTER, GRANDMASTER, CHALLENGER)" },
+          { "name": "limit", "in": "query", "required": false, "schema": { "type": "integer" }, "description": "가져올 플레이어 수 제한" }
+        ],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "type": "array", "items": { "$ref": "#/components/schemas/ApexPlayerInfoDto" } } } } },
+          "400": { "description": "Bad request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not found" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/lol/challenges/v1/challenges/{challengeId}/percentiles": {
+      "get": {
+        "tags": ["LOL-CHALLENGES-V1"],
+        "summary": "챌린지 레벨별 퍼센타일 조회",
+        "description": "특정 챌린지의 각 레벨별로 달성한 플레이어의 백분위(퍼센타일)를 반환합니다.",
+        "parameters": [
+          { "name": "challengeId", "in": "path", "required": true, "schema": { "type": "integer" }, "description": "챌린지 ID" }
+        ],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "type": "object", "additionalProperties": { "type": "number" } } } } },
+          "400": { "description": "Bad request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not found" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/lol/challenges/v1/challenges/percentiles": {
+      "get": {
+        "tags": ["LOL-CHALLENGES-V1"],
+        "summary": "전체 챌린지 퍼센타일 맵 조회",
+        "description": "모든 챌린지의 레벨별 달성 퍼센타일 정보를 조회합니다.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "type": "object", "additionalProperties": { "type": "object" } }
+              }
+            }
+          },
+          "400": { "description": "Bad request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not found" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/lol/challenges/v1/player-data/{puuid}": {
+      "get": {
+        "tags": ["LOL-CHALLENGES-V1"],
+        "summary": "플레이어 챌린지 진행도 조회",
+        "description": "특정 플레이어(PUUID)의 챌린지 진행도, 포인트, 선호 배너 정보를 조회합니다.",
+        "parameters": [
+          { "name": "puuid", "in": "path", "required": true, "schema": { "type": "string" }, "description": "플레이어의 PUUID" }
+        ],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/PlayerInfoDto" } } } },
+          "400": { "description": "Bad request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not found" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ChallengeConfigInfoDto": {
+        "type": "object",
+        "description": "챌린지 구성 정보 객체",
+        "properties": {
+          "id": { "type": "integer", "description": "챌린지 ID" },
+          "localizedNames": {
+            "type": "object",
+            "description": "언어별 이름 및 설명 (Map[String, Map[String, string]])"
+          },
+          "state": {
+            "type": "string",
+            "description": "챌린지 상태 (DISABLED, HIDDEN, ENABLED, ARCHIVED)"
+          },
+          "tracking": {
+            "type": "string",
+            "description": "진행 방식 (LIFETIME - 누적, SEASON - 시즌 단위)"
+          },
+          "startTimestamp": { "type": "integer", "description": "시작 시각 (epoch ms)" },
+          "endTimestamp": { "type": "integer", "description": "종료 시각 (epoch ms)" },
+          "leaderboard": { "type": "boolean", "description": "리더보드 포함 여부" },
+          "thresholds": {
+            "type": "object",
+            "description": "등급별 기준 값 (예: BRONZE, GOLD 등)",
+            "additionalProperties": { "type": "number" }
+          }
+        }
+      },
+      "ApexPlayerInfoDto": {
+        "type": "object",
+        "description": "챌린지 리더보드 플레이어 정보",
+        "properties": {
+          "puuid": { "type": "string", "description": "플레이어의 PUUID" },
+          "value": { "type": "number", "description": "챌린지 점수 또는 값" },
+          "position": { "type": "integer", "description": "리더보드 순위" }
+        }
+      },
+      "PlayerInfoDto": {
+        "type": "object",
+        "description": "플레이어 챌린지 진행 데이터",
+        "properties": {
+          "challenges": {
+            "type": "array",
+            "description": "플레이어의 각 챌린지 진행 정보 목록",
+            "items": { "$ref": "#/components/schemas/ChallengeInfoDto" }
+          },
+          "preferences": { "$ref": "#/components/schemas/PlayerClientPreferencesDto" },
+          "totalPoints": { "$ref": "#/components/schemas/ChallengePointDto" },
+          "categoryPoints": {
+            "type": "object",
+            "description": "카테고리별 포인트",
+            "additionalProperties": { "$ref": "#/components/schemas/ChallengePointDto" }
+          }
+        }
+      },
+      "ChallengeInfoDto": {
+        "type": "object",
+        "description": "개별 챌린지 진행 정보",
+        "properties": {
+          "percentile": { "type": "number", "description": "달성 퍼센타일" },
+          "playersInLevel": { "type": "integer", "description": "해당 레벨 달성자 수" },
+          "achievedTime": { "type": "integer", "description": "달성 시각 (epoch ms)" },
+          "value": { "type": "number", "description": "현재 점수 또는 진행도" },
+          "challengeId": { "type": "integer", "description": "챌린지 ID" },
+          "level": { "type": "string", "description": "달성 레벨 (NONE, BRONZE, SILVER, ... CHALLENGER)" },
+          "position": { "type": "integer", "description": "리더보드 내 순위" }
+        }
+      },
+      "PlayerClientPreferencesDto": {
+        "type": "object",
+        "description": "플레이어의 클라이언트 설정 정보",
+        "properties": {
+          "bannerAccent": { "type": "string", "description": "배너 강조 색상" },
+          "title": { "type": "string", "description": "표시되는 칭호" },
+          "challengeIds": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "표시 중인 챌린지 ID 목록"
+          },
+          "crestBorder": { "type": "string", "description": "엠블럼 테두리 스타일" },
+          "prestigeCrestBorderLevel": { "type": "integer", "description": "명예 테두리 레벨" }
+        }
+      },
+      "ChallengePointDto": {
+        "type": "object",
+        "description": "챌린지 포인트 정보",
+        "properties": {
+          "level": { "type": "string", "description": "현재 레벨" },
+          "current": { "type": "integer", "description": "현재 점수" },
+          "max": { "type": "integer", "description": "최대 점수" },
+          "percentile": { "type": "integer", "description": "퍼센타일" }
+        }
+      }
+    }
+  }
+}

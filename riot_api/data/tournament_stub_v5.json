@@ -1,0 +1,190 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Riot API - TOURNAMENT-STUB-V5",
+    "version": "1.0.0",
+    "description": "Riot Games 토너먼트 시스템 테스트용 Stub API입니다.\n실제 경기 진행 없이 토너먼트 코드 생성, 등록, 이벤트 조회 흐름을 테스트할 수 있습니다."
+  },
+  "tags": [
+    { "name": "TOURNAMENT-STUB-V5", "description": "토너먼트 Stub (테스트용) API" }
+  ],
+  "paths": {
+    "/lol/tournament-stub/v5/providers": {
+      "post": {
+        "tags": ["TOURNAMENT-STUB-V5"],
+        "summary": "토너먼트 Provider 생성",
+        "description": "토너먼트 제공자(provider)를 등록하고 provider ID를 반환합니다. 이후 토너먼트 생성 시 해당 ID를 사용합니다.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/ProviderRegistrationParametersV5" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "등록 성공 (providerId 반환)", "content": { "application/json": { "schema": { "type": "integer" } } } },
+          "400": { "description": "Bad request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Data not found" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/lol/tournament-stub/v5/tournaments": {
+      "post": {
+        "tags": ["TOURNAMENT-STUB-V5"],
+        "summary": "토너먼트 생성",
+        "description": "등록된 provider ID를 기반으로 새로운 토너먼트를 생성하고 tournament ID를 반환합니다.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/TournamentRegistrationParametersV5" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "토너먼트 생성 성공 (tournamentId 반환)", "content": { "application/json": { "schema": { "type": "integer" } } } },
+          "400": { "description": "Bad request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/lol/tournament-stub/v5/codes": {
+      "post": {
+        "tags": ["TOURNAMENT-STUB-V5"],
+        "summary": "토너먼트 코드 생성",
+        "description": "특정 토너먼트 ID에 대한 토너먼트 코드를 생성합니다. 한 번에 최대 1000개까지 생성 가능합니다.",
+        "parameters": [
+          { "name": "tournamentId", "in": "query", "required": true, "schema": { "type": "integer" }, "description": "토너먼트 ID" },
+          { "name": "count", "in": "query", "required": false, "schema": { "type": "integer" }, "description": "생성할 코드 개수 (최대 1000)" }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/TournamentCodeParametersV5" }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "코드 생성 성공 (코드 목록 반환)", "content": { "application/json": { "schema": { "type": "array", "items": { "type": "string" } } } } },
+          "400": { "description": "Bad request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/lol/tournament-stub/v5/codes/{tournamentCode}": {
+      "get": {
+        "tags": ["TOURNAMENT-STUB-V5"],
+        "summary": "토너먼트 코드 정보 조회",
+        "description": "토너먼트 코드 문자열을 이용하여 관련 정보를 조회합니다.",
+        "parameters": [
+          { "name": "tournamentCode", "in": "path", "required": true, "schema": { "type": "string" }, "description": "토너먼트 코드 문자열" }
+        ],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TournamentCodeV5DTO" } } } },
+          "400": { "description": "Bad request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Data not found" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/lol/tournament-stub/v5/lobby-events/by-code/{tournamentCode}": {
+      "get": {
+        "tags": ["TOURNAMENT-STUB-V5"],
+        "summary": "로비 이벤트 조회",
+        "description": "토너먼트 코드별로 발생한 로비 이벤트 목록을 반환합니다.",
+        "parameters": [
+          { "name": "tournamentCode", "in": "path", "required": true, "schema": { "type": "string" }, "description": "조회할 토너먼트 코드" }
+        ],
+        "responses": {
+          "200": { "description": "OK", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/LobbyEventV5DTOWrapper" } } } },
+          "400": { "description": "Bad request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Data not found" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ProviderRegistrationParametersV5": {
+        "type": "object",
+        "description": "토너먼트 제공자 등록 정보",
+        "properties": {
+          "region": { "type": "string", "description": "운영 지역 (예: KR, NA, EUW)" },
+          "url": { "type": "string", "description": "경기 결과 콜백 URL (http 또는 https)" }
+        }
+      },
+      "TournamentRegistrationParametersV5": {
+        "type": "object",
+        "description": "토너먼트 등록 정보",
+        "properties": {
+          "providerId": { "type": "integer", "description": "등록된 provider ID" },
+          "name": { "type": "string", "description": "토너먼트 이름 (선택사항)" }
+        }
+      },
+      "TournamentCodeParametersV5": {
+        "type": "object",
+        "description": "토너먼트 코드 생성 파라미터",
+        "properties": {
+          "allowedParticipants": { "type": "array", "items": { "type": "string" }, "description": "참가 가능한 플레이어 PUUID 목록" },
+          "enoughPlayers": { "type": "boolean", "description": "참가 인원 충분 여부" },
+          "mapType": { "type": "string", "description": "맵 타입 (예: SUMMONERS_RIFT, HOWLING_ABYSS)" },
+          "metadata": { "type": "string", "description": "코드 메타데이터 (임의 문자열)" },
+          "pickType": { "type": "string", "description": "픽 타입 (예: BLIND_PICK, DRAFT_MODE, ALL_RANDOM, TOURNAMENT_DRAFT)" },
+          "spectatorType": { "type": "string", "description": "관전 설정 (NONE, LOBBYONLY, ALL)" },
+          "teamSize": { "type": "integer", "description": "팀 크기 (1~5)" }
+        }
+      },
+      "TournamentCodeV5DTO": {
+        "type": "object",
+        "description": "토너먼트 코드 상세 정보",
+        "properties": {
+          "code": { "type": "string", "description": "토너먼트 코드 문자열" },
+          "lobbyName": { "type": "string", "description": "로비 이름" },
+          "metaData": { "type": "string", "description": "코드 메타데이터" },
+          "password": { "type": "string", "description": "로비 비밀번호" },
+          "teamSize": { "type": "integer", "description": "팀 크기" },
+          "providerId": { "type": "integer", "description": "제공자 ID" },
+          "pickType": { "type": "string", "description": "픽 모드" },
+          "tournamentId": { "type": "integer", "description": "토너먼트 ID" },
+          "region": { "type": "string", "description": "지역 (KR, NA 등)" },
+          "map": { "type": "string", "description": "맵 이름" },
+          "participants": { "type": "array", "items": { "type": "string" }, "description": "참가자 PUUID 목록" }
+        }
+      },
+      "LobbyEventV5DTOWrapper": {
+        "type": "object",
+        "description": "로비 이벤트 목록 래퍼",
+        "properties": {
+          "eventList": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/LobbyEventV5DTO" },
+            "description": "이벤트 목록"
+          }
+        }
+      },
+      "LobbyEventV5DTO": {
+        "type": "object",
+        "description": "개별 로비 이벤트 정보",
+        "properties": {
+          "timestamp": { "type": "string", "description": "이벤트 발생 시각" },
+          "eventType": { "type": "string", "description": "이벤트 타입" },
+          "puuid": { "type": "string", "description": "이벤트를 발생시킨 플레이어의 PUUID" }
+        }
+      }
+    }
+  }
+}

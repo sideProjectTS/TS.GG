@@ -1,0 +1,130 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Riot API - LOL-STATUS-V4",
+    "version": "1.0.0",
+    "description": "리그 오브 레전드 서버 상태 및 점검 정보 API 명세입니다.\n각 플랫폼(서버)의 현재 상태, 점검, 장애 발생 이력을 제공합니다."
+  },
+  "tags": [
+    { "name": "LOL-STATUS-V4", "description": "LoL 서버 상태 및 점검 관련 API 엔드포인트" }
+  ],
+  "paths": {
+    "/lol/status/v4/platform-data": {
+      "get": {
+        "tags": ["LOL-STATUS-V4"],
+        "summary": "플랫폼 서버 상태 조회",
+        "description": "지정된 플랫폼(예: KR, NA1 등)의 현재 서버 상태, 점검 일정, 장애 내역을 조회합니다.",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/PlatformDataDto" }
+              }
+            }
+          },
+          "400": { "description": "Bad request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not found" },
+          "405": { "description": "Method not allowed" },
+          "415": { "description": "Unsupported media type" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Internal server error" },
+          "502": { "description": "Bad gateway" },
+          "503": { "description": "Service unavailable" },
+          "504": { "description": "Gateway timeout" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "PlatformDataDto": {
+        "type": "object",
+        "description": "플랫폼 서버 상태 데이터",
+        "properties": {
+          "id": { "type": "string", "description": "플랫폼 ID (예: KR, NA1)" },
+          "name": { "type": "string", "description": "플랫폼 이름" },
+          "locales": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "지원 언어 목록 (예: en_US, ko_KR)"
+          },
+          "maintenances": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/StatusDto" },
+            "description": "진행 중이거나 예정된 점검 목록"
+          },
+          "incidents": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/StatusDto" },
+            "description": "장애 및 주요 알림 목록"
+          }
+        }
+      },
+      "StatusDto": {
+        "type": "object",
+        "description": "점검 또는 장애 상태 데이터",
+        "properties": {
+          "id": { "type": "integer", "description": "상태 ID" },
+          "maintenance_status": {
+            "type": "string",
+            "description": "점검 상태 (scheduled, in_progress, complete)"
+          },
+          "incident_severity": {
+            "type": "string",
+            "description": "장애 심각도 (info, warning, critical)"
+          },
+          "titles": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ContentDto" },
+            "description": "상태 제목 다국어 데이터"
+          },
+          "updates": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/UpdateDto" },
+            "description": "상태 업데이트 내역"
+          },
+          "created_at": { "type": "string", "description": "생성 일시 (ISO8601)" },
+          "archive_at": { "type": "string", "description": "보관 일시 (ISO8601)" },
+          "updated_at": { "type": "string", "description": "최근 갱신 일시 (ISO8601)" },
+          "platforms": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "적용 플랫폼 (windows, macos, android, ios, ps4, xbone, switch)"
+          }
+        }
+      },
+      "ContentDto": {
+        "type": "object",
+        "description": "다국어 콘텐츠 데이터",
+        "properties": {
+          "locale": { "type": "string", "description": "언어 코드 (예: en_US, ko_KR)" },
+          "content": { "type": "string", "description": "해당 언어의 텍스트 내용" }
+        }
+      },
+      "UpdateDto": {
+        "type": "object",
+        "description": "업데이트 상세 데이터",
+        "properties": {
+          "id": { "type": "integer", "description": "업데이트 ID" },
+          "author": { "type": "string", "description": "작성자" },
+          "publish": { "type": "boolean", "description": "공개 여부" },
+          "publish_locations": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "공개 위치 (riotclient, riotstatus, game)"
+          },
+          "translations": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/ContentDto" },
+            "description": "업데이트 다국어 번역 데이터"
+          },
+          "created_at": { "type": "string", "description": "생성 시각 (ISO8601)" },
+          "updated_at": { "type": "string", "description": "최근 수정 시각 (ISO8601)" }
+        }
+      }
+    }
+  }
+}

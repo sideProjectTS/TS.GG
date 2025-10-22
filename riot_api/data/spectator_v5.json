@@ -1,0 +1,133 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Riot API - SPECTATOR-V5",
+    "version": "1.0.0",
+    "description": "현재 진행 중인 리그 오브 레전드 게임(관전 정보)을 조회하는 API입니다.\nPUUID를 기준으로 실시간 게임 상태, 밴 챔피언, 참가자, 룬, 스펠 정보를 제공합니다."
+  },
+  "tags": [
+    { "name": "SPECTATOR-V5", "description": "LoL 실시간 게임 관전 데이터 API" }
+  ],
+  "paths": {
+    "/lol/spectator/v5/active-games/by-summoner/{encryptedPUUID}": {
+      "get": {
+        "tags": ["SPECTATOR-V5"],
+        "summary": "PUUID 기준 현재 게임 정보 조회",
+        "description": "해당 소환사(encryptedPUUID)가 현재 참여 중인 실시간 게임 정보를 반환합니다.\n게임이 진행 중이 아닐 경우 404를 반환합니다.",
+        "parameters": [
+          {
+            "name": "encryptedPUUID",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "소환사의 암호화된 PUUID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/CurrentGameInfo" }
+              }
+            }
+          },
+          "400": { "description": "Bad request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Data not found" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Internal server error" },
+          "502": { "description": "Bad gateway" },
+          "503": { "description": "Service unavailable" },
+          "504": { "description": "Gateway timeout" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "CurrentGameInfo": {
+        "type": "object",
+        "description": "현재 진행 중인 게임의 전체 정보",
+        "properties": {
+          "gameId": { "type": "integer", "description": "게임 ID" },
+          "gameType": { "type": "string", "description": "게임 타입 (예: MATCHED_GAME, CUSTOM_GAME)" },
+          "gameStartTime": { "type": "integer", "description": "게임 시작 시각 (epoch milliseconds)" },
+          "mapId": { "type": "integer", "description": "맵 ID" },
+          "gameLength": { "type": "integer", "description": "게임 진행 시간 (초 단위)" },
+          "platformId": { "type": "string", "description": "게임이 진행 중인 플랫폼 (예: KR1, NA1)" },
+          "gameMode": { "type": "string", "description": "게임 모드 (예: CLASSIC, ARAM)" },
+          "gameQueueConfigId": { "type": "integer", "description": "큐 ID (예: 420=솔로랭크, 440=자유랭크)" },
+          "bannedChampions": {
+            "type": "array",
+            "description": "밴된 챔피언 목록",
+            "items": { "$ref": "#/components/schemas/BannedChampion" }
+          },
+          "observers": { "$ref": "#/components/schemas/Observer" },
+          "participants": {
+            "type": "array",
+            "description": "게임 참가자 목록",
+            "items": { "$ref": "#/components/schemas/CurrentGameParticipant" }
+          }
+        }
+      },
+      "BannedChampion": {
+        "type": "object",
+        "description": "밴된 챔피언 정보",
+        "properties": {
+          "pickTurn": { "type": "integer", "description": "밴된 순서" },
+          "championId": { "type": "integer", "description": "밴된 챔피언 ID" },
+          "teamId": { "type": "integer", "description": "밴한 팀 ID (100=블루, 200=레드)" }
+        }
+      },
+      "Observer": {
+        "type": "object",
+        "description": "관전자 정보 (리플레이 복호화 키 포함)",
+        "properties": {
+          "encryptionKey": { "type": "string", "description": "리플레이 복호화용 암호화 키" }
+        }
+      },
+      "CurrentGameParticipant": {
+        "type": "object",
+        "description": "현재 게임 참가자 정보",
+        "properties": {
+          "championId": { "type": "integer", "description": "챔피언 ID" },
+          "profileIconId": { "type": "integer", "description": "프로필 아이콘 ID" },
+          "bot": { "type": "boolean", "description": "봇 여부" },
+          "teamId": { "type": "integer", "description": "팀 ID (100=블루, 200=레드)" },
+          "puuid": { "type": "string", "description": "참가자 PUUID (익명일 경우 null)" },
+          "spell1Id": { "type": "integer", "description": "첫 번째 소환사 주문 ID" },
+          "spell2Id": { "type": "integer", "description": "두 번째 소환사 주문 ID" },
+          "perks": { "$ref": "#/components/schemas/Perks" },
+          "gameCustomizationObjects": {
+            "type": "array",
+            "description": "게임 커스터마이징 항목",
+            "items": { "$ref": "#/components/schemas/GameCustomizationObject" }
+          }
+        }
+      },
+      "Perks": {
+        "type": "object",
+        "description": "룬 및 특성 정보",
+        "properties": {
+          "perkIds": {
+            "type": "array",
+            "items": { "type": "integer" },
+            "description": "적용된 룬 ID 목록"
+          },
+          "perkStyle": { "type": "integer", "description": "주 룬 경로 ID" },
+          "perkSubStyle": { "type": "integer", "description": "보조 룬 경로 ID" }
+        }
+      },
+      "GameCustomizationObject": {
+        "type": "object",
+        "description": "게임 커스터마이징 항목",
+        "properties": {
+          "category": { "type": "string", "description": "커스터마이징 카테고리 (예: 'ChampionSkin')" },
+          "content": { "type": "string", "description": "커스터마이징 내용" }
+        }
+      }
+    }
+  }
+}

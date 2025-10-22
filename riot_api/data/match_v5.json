@@ -1,0 +1,185 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Riot API - LOL-MATCH-V5",
+    "version": "1.0.0",
+    "description": "리그 오브 레전드 매치 기록 조회 API 명세입니다.\nPUUID를 기준으로 매치 ID 목록, 매치 상세, 타임라인 정보를 제공합니다."
+  },
+  "tags": [
+    { "name": "LOL-MATCH-V5", "description": "LoL 매치 데이터 조회용 API" }
+  ],
+  "paths": {
+    "/lol/match/v5/matches/by-puuid/{puuid}/ids": {
+      "get": {
+        "tags": ["LOL-MATCH-V5"],
+        "summary": "PUUID 기준 매치 ID 목록 조회",
+        "description": "플레이어의 PUUID를 기준으로 최근 매치 ID 목록을 조회합니다.",
+        "parameters": [
+          { "name": "puuid", "in": "path", "required": true, "schema": { "type": "string" }, "description": "플레이어의 PUUID" },
+          { "name": "startTime", "in": "query", "required": false, "schema": { "type": "integer" }, "description": "조회 시작 시각 (Epoch 초)" },
+          { "name": "endTime", "in": "query", "required": false, "schema": { "type": "integer" }, "description": "조회 종료 시각 (Epoch 초)" },
+          { "name": "queue", "in": "query", "required": false, "schema": { "type": "integer" }, "description": "큐 ID 필터 (예: 420 = 솔로랭크)" },
+          { "name": "type", "in": "query", "required": false, "schema": { "type": "string" }, "description": "매치 유형 필터 (예: ranked, normal)" },
+          { "name": "start", "in": "query", "required": false, "schema": { "type": "integer", "default": 0 }, "description": "시작 인덱스 (기본값 0)" },
+          { "name": "count", "in": "query", "required": false, "schema": { "type": "integer", "default": 20 }, "description": "가져올 매치 개수 (0~100)" }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "type": "array", "items": { "type": "string" } } } }
+          },
+          "400": { "description": "Bad request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not found" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/lol/match/v5/matches/{matchId}": {
+      "get": {
+        "tags": ["LOL-MATCH-V5"],
+        "summary": "매치 상세 정보 조회",
+        "description": "매치 ID를 기반으로 상세 데이터를 조회합니다. 참가자, 팀, 챔피언, 피해량 등 다양한 정보가 포함됩니다.",
+        "parameters": [
+          { "name": "matchId", "in": "path", "required": true, "schema": { "type": "string" }, "description": "매치 ID (예: KR_1234567890)" }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/MatchDto" } } }
+          },
+          "400": { "description": "Bad request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not found" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    },
+    "/lol/match/v5/matches/{matchId}/timeline": {
+      "get": {
+        "tags": ["LOL-MATCH-V5"],
+        "summary": "매치 타임라인 조회",
+        "description": "매치의 시간 단위 이벤트 데이터(프레임, 킬, 오브젝트, 위치 등)를 조회합니다.",
+        "parameters": [
+          { "name": "matchId", "in": "path", "required": true, "schema": { "type": "string" }, "description": "매치 ID (예: KR_1234567890)" }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/TimelineDto" } } }
+          },
+          "400": { "description": "Bad request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not found" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Internal server error" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "MatchDto": {
+        "type": "object",
+        "description": "매치 상세 데이터 객체",
+        "properties": {
+          "metadata": { "$ref": "#/components/schemas/MetadataDto" },
+          "info": { "$ref": "#/components/schemas/InfoDto" }
+        }
+      },
+      "MetadataDto": {
+        "type": "object",
+        "description": "매치 메타데이터",
+        "properties": {
+          "dataVersion": { "type": "string", "description": "데이터 버전" },
+          "matchId": { "type": "string", "description": "매치 ID" },
+          "participants": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "참가자 PUUID 목록"
+          }
+        }
+      },
+      "InfoDto": {
+        "type": "object",
+        "description": "매치 세부 정보",
+        "properties": {
+          "gameId": { "type": "integer", "description": "게임 ID" },
+          "gameMode": { "type": "string", "description": "게임 모드 (예: CLASSIC, ARAM)" },
+          "gameVersion": { "type": "string", "description": "게임 버전" },
+          "mapId": { "type": "integer", "description": "맵 ID" },
+          "participants": {
+            "type": "array",
+            "description": "참가자 목록",
+            "items": { "$ref": "#/components/schemas/ParticipantDto" }
+          },
+          "teams": {
+            "type": "array",
+            "description": "팀 정보",
+            "items": { "$ref": "#/components/schemas/TeamDto" }
+          }
+        }
+      },
+      "ParticipantDto": {
+        "type": "object",
+        "description": "참가자별 매치 상세 데이터",
+        "properties": {
+          "puuid": { "type": "string", "description": "플레이어 PUUID" },
+          "summonerName": { "type": "string", "description": "소환사 이름" },
+          "championName": { "type": "string", "description": "플레이한 챔피언" },
+          "teamId": { "type": "integer", "description": "팀 ID (100 = 블루, 200 = 레드)" },
+          "kills": { "type": "integer", "description": "킬 수" },
+          "deaths": { "type": "integer", "description": "데스 수" },
+          "assists": { "type": "integer", "description": "어시스트 수" },
+          "totalDamageDealtToChampions": { "type": "integer", "description": "챔피언에게 가한 총 피해량" },
+          "visionScore": { "type": "integer", "description": "시야 점수" },
+          "win": { "type": "boolean", "description": "승리 여부" }
+        }
+      },
+      "TeamDto": {
+        "type": "object",
+        "description": "팀 단위 정보",
+        "properties": {
+          "teamId": { "type": "integer", "description": "팀 ID" },
+          "win": { "type": "boolean", "description": "팀 승리 여부" },
+          "bans": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/BanDto" },
+            "description": "밴 정보 목록"
+          }
+        }
+      },
+      "BanDto": {
+        "type": "object",
+        "properties": {
+          "championId": { "type": "integer", "description": "밴된 챔피언 ID" },
+          "pickTurn": { "type": "integer", "description": "밴 순서" }
+        }
+      },
+      "TimelineDto": {
+        "type": "object",
+        "description": "매치 타임라인 데이터",
+        "properties": {
+          "metadata": { "$ref": "#/components/schemas/MetadataDto" },
+          "info": {
+            "type": "object",
+            "description": "프레임 단위 이벤트 데이터",
+            "properties": {
+              "frames": {
+                "type": "array",
+                "items": { "type": "object" },
+                "description": "시간별 프레임 데이터"
+              },
+              "frameInterval": { "type": "integer", "description": "프레임 간격 (ms)" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

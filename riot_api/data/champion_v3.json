@@ -1,0 +1,70 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Riot API - CHAMPION-V3",
+    "version": "1.0.0",
+    "description": "리그 오브 레전드의 무료 챔피언 로테이션 정보를 조회하는 Riot Games API (CHAMPION-V3)"
+  },
+  "tags": [
+    { "name": "CHAMPION-V3", "description": "Riot 챔피언 로테이션 관련 API" }
+  ],
+  "paths": {
+    "/lol/platform/v3/champion-rotations": {
+      "get": {
+        "tags": ["CHAMPION-V3"],
+        "summary": "챔피언 로테이션 정보 조회",
+        "description": "현재 무료로 플레이할 수 있는 챔피언 목록과 신규 플레이어용 무료 챔피언 정보를 반환합니다.",
+        "responses": {
+          "200": {
+            "description": "ChampionInfo - 챔피언 로테이션 정보",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ChampionInfo" }
+              }
+            }
+          },
+          "400": { "description": "Bad request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not found" },
+          "405": { "description": "Method not allowed" },
+          "415": { "description": "Unsupported media type" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Internal server error" },
+          "502": { "description": "Bad gateway" },
+          "503": { "description": "Service unavailable" },
+          "504": { "description": "Gateway timeout" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "ChampionInfo": {
+        "type": "object",
+        "description": "현재 무료 챔피언 및 신규 플레이어용 챔피언 로테이션 정보",
+        "properties": {
+          "maxNewPlayerLevel": {
+            "type": "integer",
+            "description": "신규 플레이어 로테이션이 적용되는 최대 레벨"
+          },
+          "freeChampionIdsForNewPlayers": {
+            "type": "array",
+            "description": "신규 플레이어용 무료 챔피언 ID 목록",
+            "items": { "type": "integer" }
+          },
+          "freeChampionIds": {
+            "type": "array",
+            "description": "일반 무료 챔피언 ID 목록",
+            "items": { "type": "integer" }
+          }
+        },
+        "example": {
+          "maxNewPlayerLevel": 10,
+          "freeChampionIdsForNewPlayers": [1, 2, 3, 4, 5],
+          "freeChampionIds": [6, 7, 8, 9, 10, 11, 12, 13, 14, 15]
+        }
+      }
+    }
+  }
+}

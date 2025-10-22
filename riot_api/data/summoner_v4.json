@@ -1,0 +1,108 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Riot API - SUMMONER-V4",
+    "version": "1.0.0",
+    "description": "소환사(Summoner) 기본 정보를 조회하는 API입니다.\nPUUID 또는 Access Token을 기반으로 소환사 레벨, 아이콘, 마지막 수정일 등을 반환합니다."
+  },
+  "tags": [
+    { "name": "SUMMONER-V4", "description": "소환사 기본 정보 관련 API" }
+  ],
+  "paths": {
+    "/lol/summoner/v4/summoners/by-puuid/{encryptedPUUID}": {
+      "get": {
+        "tags": ["SUMMONER-V4"],
+        "summary": "PUUID 기준 소환사 정보 조회",
+        "description": "암호화된 PUUID를 이용하여 해당 플레이어의 소환사 기본 정보를 조회합니다.",
+        "parameters": [
+          {
+            "name": "encryptedPUUID",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "암호화된 PUUID (정확히 78자)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SummonerDTO" }
+              }
+            }
+          },
+          "400": { "description": "Bad request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Data not found" },
+          "405": { "description": "Method not allowed" },
+          "415": { "description": "Unsupported media type" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Internal server error" },
+          "502": { "description": "Bad gateway" },
+          "503": { "description": "Service unavailable" },
+          "504": { "description": "Gateway timeout" }
+        }
+      }
+    },
+    "/lol/summoner/v4/summoners/me": {
+      "get": {
+        "tags": ["SUMMONER-V4"],
+        "summary": "Access Token 기반 내 소환사 정보 조회",
+        "description": "Access Token(`Authorization: Bearer {token}`)을 이용해 현재 로그인한 소환사의 정보를 조회합니다.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Bearer {access_token} 형식의 인증 헤더"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/SummonerDTO" }
+              }
+            }
+          },
+          "400": { "description": "Bad request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Data not found" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Internal server error" },
+          "502": { "description": "Bad gateway" },
+          "503": { "description": "Service unavailable" },
+          "504": { "description": "Gateway timeout" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "SummonerDTO": {
+        "type": "object",
+        "description": "소환사 기본 정보 객체",
+        "properties": {
+          "profileIconId": { "type": "integer", "description": "소환사 프로필 아이콘 ID" },
+          "revisionDate": {
+            "type": "integer",
+            "description": "소환사 정보가 마지막으로 수정된 시각 (epoch milliseconds)"
+          },
+          "puuid": { "type": "string", "description": "암호화된 PUUID (78자)" },
+          "summonerLevel": { "type": "integer", "description": "소환사 레벨" }
+        },
+        "example": {
+          "profileIconId": 4567,
+          "revisionDate": 1698001234567,
+          "puuid": "abcd1234efgh5678ijklmnopqrstuvwx1234567890yzabcd1234efgh5678ijklmnop",
+          "summonerLevel": 207
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,218 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Riot API - ACCOUNT-V1",
+    "version": "1.0.0",
+    "description": "Riot Games의 Account API (ACCOUNT-V1) 명세.\n플레이어 계정, 식별자, 활성 샤드(region) 관련 정보를 제공합니다."
+  },
+  "tags": [
+    { "name": "ACCOUNT-V1", "description": "Riot Account 관련 API 엔드포인트" }
+  ],
+  "paths": {
+    "/riot/account/v1/accounts/by-puuid/{puuid}": {
+      "get": {
+        "tags": ["ACCOUNT-V1"],
+        "summary": "PUUID로 계정 조회",
+        "description": "플레이어의 암호화된 PUUID를 통해 Riot 계정 정보를 조회합니다.",
+        "parameters": [
+          {
+            "name": "puuid",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "암호화된 PUUID (정확히 78자)"
+          }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "400": { "description": "Bad request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not found" },
+          "405": { "description": "Method not allowed" },
+          "415": { "description": "Unsupported media type" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Internal server error" },
+          "502": { "description": "Bad gateway" },
+          "503": { "description": "Service unavailable" },
+          "504": { "description": "Gateway timeout" }
+        }
+      }
+    },
+    "/riot/account/v1/accounts/by-riot-id/{gameName}/{tagLine}": {
+      "get": {
+        "tags": ["ACCOUNT-V1"],
+        "summary": "Riot ID로 계정 조회",
+        "description": "Riot ID의 gameName과 tagLine을 이용해 Riot 계정 정보를 조회합니다.",
+        "parameters": [
+          {
+            "name": "gameName",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Riot ID의 gameName"
+          },
+          {
+            "name": "tagLine",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Riot ID의 tagLine"
+          }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "400": { "description": "Bad request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not found" },
+          "405": { "description": "Method not allowed" },
+          "415": { "description": "Unsupported media type" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Internal server error" },
+          "502": { "description": "Bad gateway" },
+          "503": { "description": "Service unavailable" },
+          "504": { "description": "Gateway timeout" }
+        }
+      }
+    },
+    "/riot/account/v1/accounts/me": {
+      "get": {
+        "tags": ["ACCOUNT-V1"],
+        "summary": "Access Token으로 본인 계정 조회",
+        "description": "Access Token(Authorization 헤더)을 사용해 현재 로그인한 플레이어의 Riot 계정 정보를 조회합니다.",
+        "parameters": [
+          {
+            "name": "Authorization",
+            "in": "header",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "Bearer {access_token} 형식의 인증 헤더"
+          }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "400": { "description": "Bad request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not found" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Internal server error" },
+          "503": { "description": "Service unavailable" }
+        }
+      }
+    },
+    "/riot/account/v1/active-shards/by-game/{game}/by-puuid/{puuid}": {
+      "get": {
+        "tags": ["ACCOUNT-V1"],
+        "summary": "플레이어 활성 샤드 조회",
+        "description": "플레이어가 속한 게임의 활성 샤드(서버 클러스터) 정보를 조회합니다.",
+        "parameters": [
+          {
+            "name": "game",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "게임 코드 (예: lol, tft 등)"
+          },
+          {
+            "name": "puuid",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "플레이어의 PUUID"
+          }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "400": { "description": "Bad request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not found" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Internal server error" },
+          "503": { "description": "Service unavailable" }
+        }
+      }
+    },
+    "/riot/account/v1/region/by-game/{game}/by-puuid/{puuid}": {
+      "get": {
+        "tags": ["ACCOUNT-V1"],
+        "summary": "플레이어 활성 지역 조회 (LOL, TFT)",
+        "description": "플레이어의 활성 지역(Region) 정보를 조회합니다. 리그 오브 레전드와 TFT에서만 제공됩니다.",
+        "parameters": [
+          {
+            "name": "game",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "게임 코드 (예: lol, tft 등)"
+          },
+          {
+            "name": "puuid",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" },
+            "description": "플레이어의 PUUID"
+          }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "400": { "description": "Bad request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "404": { "description": "Not found" },
+          "429": { "description": "Rate limit exceeded" },
+          "500": { "description": "Internal server error" },
+          "503": { "description": "Service unavailable" }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "AccountDto": {
+        "type": "object",
+        "description": "플레이어 기본 계정 정보",
+        "properties": {
+          "puuid": { "type": "string", "description": "암호화된 플레이어 PUUID (78자)" },
+          "gameName": { "type": "string", "description": "플레이어의 Riot ID 이름" },
+          "tagLine": { "type": "string", "description": "플레이어의 Riot ID 태그" }
+        },
+        "example": {
+          "puuid": "abcd1234efgh5678ijkl",
+          "gameName": "Summoner123",
+          "tagLine": "KR1"
+        }
+      },
+      "ActiveShardDto": {
+        "type": "object",
+        "description": "플레이어가 현재 활동 중인 게임 샤드(서버) 정보",
+        "properties": {
+          "puuid": { "type": "string", "description": "암호화된 플레이어 PUUID" },
+          "game": { "type": "string", "description": "게임 코드 (예: lol, tft)" },
+          "activeShard": { "type": "string", "description": "활성 샤드 이름" }
+        },
+        "example": {
+          "puuid": "abcd1234efgh5678ijkl",
+          "game": "lol",
+          "activeShard": "KR"
+        }
+      },
+      "AccountRegionDTO": {
+        "type": "object",
+        "description": "플레이어의 활성 지역(Region) 정보",
+        "properties": {
+          "puuid": { "type": "string", "description": "플레이어 고유 식별자" },
+          "game": { "type": "string", "description": "게임 코드 (lol, tft 등)" },
+          "region": { "type": "string", "description": "활성 지역 이름" }
+        },
+        "example": {
+          "puuid": "abcd1234efgh5678ijkl",
+          "game": "tft",
+          "region": "ASIA"
+        }
+      }
+    }
+  }
+}
