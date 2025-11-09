@@ -1,0 +1,71 @@
+### --- Global --- ###
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Env / secrets
+.env
+.env.*
+!env.example
+
+# Docker
+docker-compose.override.yml
+*.pid
+
+# Build outputs
+build/
+dist/
+out/
+target/
+
+# Maven
+.mvn/timing.properties
+!**/mvn/wrapper/maven-wrapper.jar
+!.mvn/wrapper/maven-wrapper.jar
+
+# IDE
+.idea/
+backend/.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.idea/shelf/
+.idea/workspace.xml
+.idea/httpRequests/
+
+# Eclipse / STS
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+
+# NetBeans
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+# OS temp
+ehthumbs.db
+Desktop.ini
+
+# Temporary
+tmp/
+temp/
+__pycache__/
+
+# Local DB / test data
+*.db
+*.sqlite
+
+# Tomcat
+.smarttomcat/
